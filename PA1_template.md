@@ -1,13 +1,9 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 ## Loading and preprocessing the data
 
-```{r}
+
+```r
 if(!file.exists('activity.csv')){
   unzip('activity.zip')
 }
@@ -18,37 +14,77 @@ data$date <- as.Date(data$date, format = "%Y-%m-%d")
 
 ## What is mean total number of steps taken per day?
 
-```{r}
+
+```r
 library("ggplot2")
+```
+
+```
+## Warning: package 'ggplot2' was built under R version 3.2.4
+```
+
+```r
 steps_per_day <- aggregate(steps ~ date, data, sum)
 histogram <- ggplot(steps_per_day, aes(steps)) + geom_histogram(binwidth = 1000)
 histogram + labs(title="Histogram of Mean number of steps taken per day", 
          x = "Number of steps per day", 
          y = "Steps count in a day")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)
+
+```r
 mean(steps_per_day$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(steps_per_day$steps)
+```
+
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
 
-```{r}
+
+```r
 steps_per_interval <- aggregate(steps ~ interval, data, mean, na.rm = T)
 
 time_series <- ggplot(steps_per_interval, aes(interval, steps))
 time_series + geom_line() + labs(title = "Average daily activity pattern",
                                  y = "Steps")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)
+
+```r
 max_steps_interval <- steps_per_interval[which.max(steps_per_interval$steps), ]
 max_steps_interval
 ```
 
+```
+##     interval    steps
+## 104      835 206.1698
+```
+
 ## Imputing missing values
 
-```{r}
+
+```r
 missing <- sum(is.na(data$steps))
 missing
+```
 
+```
+## [1] 2304
+```
+
+```r
 steps_col <- numeric()
 for(i in 1:nrow(data)){
   this_obs <- data[i, ]
@@ -69,15 +105,31 @@ histogram <- ggplot(steps_per_day_filled, aes(steps)) + geom_histogram(binwidth 
 histogram + labs(title="Histogram of Mean number of steps taken per day after removing NAs", 
                  x = "Number of steps per day", 
                  y = "Steps count in a day")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)
+
+```r
 mean(steps_per_day_filled$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(steps_per_day_filled$steps)
+```
+
+```
+## [1] 10766.19
 ```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r}
+
+```r
 days <- weekdays(data$date)
 day_class <- vector()
 for(i in 1:nrow(data)){
@@ -95,5 +147,6 @@ steps_per_interveal_dc <- aggregate(steps ~ interval + day_class, data, mean, na
 g <- ggplot(steps_per_interveal_dc, aes(interval, steps)) + geom_line() + facet_wrap( ~ day_class, nrow = 2, ncol = 1)
 g + labs(title = "Differences in activity patterns between weekdays and weekends", 
          y = "Steps")
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)
